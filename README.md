@@ -23,7 +23,7 @@ A production-minded Expo SDK 57 starter with Expo Router, React Native Paper, st
 
 ## Work with the other templates
 
-Run `pocketbase-next-backend-template` first, then `next-pocketbase-frontend-template`, and finally this app. Mobile requests `GET /api/health` from Next.js; Next.js validates and presents PocketBase's `GET /api/v1/health` response. No repository imports another repository's files.
+Run `pocketbase-backend-template` first, then `next-frontend-template`, and finally this app. Mobile requests `GET /api/health` from Next.js; Next.js validates and presents PocketBase's `GET /api/v1/health` response. No repository imports another repository's files.
 
 With the stack running:
 

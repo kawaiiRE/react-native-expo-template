@@ -19,8 +19,8 @@ Change the API version before removing or redefining a field used by an independ
 
 ## Local workflow
 
-1. Start `pocketbase-next-backend-template` on its documented loopback port.
-2. Start `next-pocketbase-frontend-template` with `POCKETBASE_URL` pointing to PocketBase.
+1. Start `pocketbase-backend-template` on its documented loopback port.
+2. Start `next-frontend-template` with `POCKETBASE_URL` pointing to PocketBase.
 3. Set `EXPO_PUBLIC_API_BASE_URL` to the Next.js origin and start this project.
 4. Run `corepack yarn integration:check`.
 
