@@ -6889,20 +6889,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mobx-react-lite@npm:^4.1.1":
-  version: 4.1.1
-  resolution: "mobx-react-lite@npm:4.1.1"
-  dependencies:
-    use-sync-external-store: "npm:^1.4.0"
+"mobx-react-lite@npm:^5.0.3":
+  version: 5.0.3
+  resolution: "mobx-react-lite@npm:5.0.3"
   peerDependencies:
-    mobx: ^6.9.0
-    react: ^16.8.0 || ^17 || ^18 || ^19
-  peerDependenciesMeta:
-    react-dom:
-      optional: true
-    react-native:
-      optional: true
-  checksum: 10c0/296b29487dc9fae7b7dd8eb39454d980fcfe59bf4c160ac911faa55469f9ebe2953661efca588f6d7929a2b071f234c7c4d717beaf5819d548be9b58c39874f1
+    mobx: ^7.0.0
+    react: ^18 || ^19
+  checksum: 10c0/e648585b93d5a2ee94e13ebefab3267f1be2c1d60fcca1bbc1fac33e4bf73881e846fbe83d0a33a5cce4adb6726a5f6ac196f035cd0d4d2ce103759b7c356dd1
   languageName: node
   linkType: hard
 
@@ -7623,7 +7616,7 @@ __metadata:
     expo-splash-screen: "npm:~57.0.9"
     expo-status-bar: "npm:~57.0.1"
     mobx: "npm:^6.15.3"
-    mobx-react-lite: "npm:^4.1.1"
+    mobx-react-lite: "npm:^5.0.3"
     prettier: "npm:^3.8.1"
     react: "npm:19.2.3"
     react-dom: "npm:19.2.3"
@@ -9194,15 +9187,6 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 10c0/161599bf921cfaa41c85d2b01c871975ee99260f3e874c2d41c05890d41170297bdcf314bc5185e7a700de2034ac5b888e3efc8e9f35724f4918f53538d717c9
-  languageName: node
-  linkType: hard
-
-"use-sync-external-store@npm:^1.4.0":
-  version: 1.7.0
-  resolution: "use-sync-external-store@npm:1.7.0"
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/6bae7cb778ce611131ec830c4e469fbc2872acefc25d2e4cf1c28b8628690689770742a9f2f0642c95134f9c77041fee60f0352f81ca43f96643b0ed01774726
   languageName: node
   linkType: hard
 
