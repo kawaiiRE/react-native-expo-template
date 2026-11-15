@@ -1,42 +1,48 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { HealthViewModel } from '@/contracts/health';
-import { readHealth } from '@/services/health/healthService';
+import type { HealthReport } from '@/models/auth';
+import type { AppError, AppResult } from '@/models/errors';
+import { useServices } from '@/stores/AppEnvironmentContext';
 
 export type HealthStatus =
   | { state: 'loading' }
-  | { state: 'available'; data: HealthViewModel }
-  | { state: 'unavailable'; message: string };
+  | { state: 'available'; data: HealthReport }
+  | { state: 'unavailable'; data: HealthReport | null; error: AppError | null };
 
-async function loadHealth(): Promise<HealthStatus> {
-  const result = await readHealth();
-
-  return result.success
-    ? { state: 'available', data: result.data }
-    : { state: 'unavailable', message: result.error.message };
+function toStatus(result: AppResult<HealthReport>): HealthStatus {
+  if (!result.ok) {
+    return { state: 'unavailable', data: null, error: result.error };
+  }
+  if (!result.data.available) {
+    return { state: 'unavailable', data: result.data, error: null };
+  }
+  return { state: 'available', data: result.data };
 }
 
 export function useHealthStatus() {
+  const { health } = useServices();
   const [status, setStatus] = useState<HealthStatus>({ state: 'loading' });
+  const controllerRef = useRef<AbortController | null>(null);
 
-  const refresh = useCallback(async () => {
+  const check = useCallback(() => {
+    controllerRef.current?.abort();
+    const controller = new AbortController();
+    controllerRef.current = controller;
+
+    return health.check(controller.signal).then((result) => {
+      if (!controller.signal.aborted) setStatus(toStatus(result));
+    });
+  }, [health]);
+
+  const refresh = useCallback(() => {
     setStatus({ state: 'loading' });
-    setStatus(await loadHealth());
-  }, []);
+    return check();
+  }, [check]);
 
   useEffect(() => {
-    let isActive = true;
-
-    void loadHealth().then((nextStatus) => {
-      if (isActive) {
-        setStatus(nextStatus);
-      }
-    });
-
-    return () => {
-      isActive = false;
-    };
-  }, []);
+    void check();
+    return () => controllerRef.current?.abort();
+  }, [check]);
 
   return { refresh, status };
 }

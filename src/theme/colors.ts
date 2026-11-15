@@ -1,0 +1,116 @@
+import type { MD3Theme } from 'react-native-paper';
+
+export type AppStatusColors = {
+  success: string;
+  onSuccess: string;
+  successContainer: string;
+  onSuccessContainer: string;
+  warning: string;
+  onWarning: string;
+  warningContainer: string;
+  onWarningContainer: string;
+};
+
+export type AppColors = MD3Theme['colors'] & AppStatusColors;
+
+export const lightColors: AppColors = {
+  primary: '#2457D6',
+  onPrimary: '#FFFFFF',
+  primaryContainer: '#DCE4FF',
+  onPrimaryContainer: '#00174D',
+  secondary: '#575E71',
+  onSecondary: '#FFFFFF',
+  secondaryContainer: '#DBE2F9',
+  onSecondaryContainer: '#141B2C',
+  tertiary: '#8A5A00',
+  onTertiary: '#FFFFFF',
+  tertiaryContainer: '#FFDDB0',
+  onTertiaryContainer: '#2B1700',
+  error: '#BA1A1A',
+  onError: '#FFFFFF',
+  errorContainer: '#FFDAD6',
+  onErrorContainer: '#410002',
+  background: '#F9FAFD',
+  onBackground: '#1A1C22',
+  surface: '#F9FAFD',
+  onSurface: '#1A1C22',
+  surfaceVariant: '#E1E2EC',
+  onSurfaceVariant: '#44474F',
+  outline: '#757780',
+  outlineVariant: '#C5C6D0',
+  shadow: '#000000',
+  scrim: '#000000',
+  inverseSurface: '#2F3036',
+  inverseOnSurface: '#F1F0F7',
+  inversePrimary: '#B4C5FF',
+  surfaceDisabled: 'rgba(26, 28, 34, 0.12)',
+  onSurfaceDisabled: 'rgba(26, 28, 34, 0.38)',
+  backdrop: 'rgba(46, 48, 56, 0.4)',
+  elevation: {
+    level0: 'transparent',
+    level1: '#F1F3FB',
+    level2: '#EBEFF9',
+    level3: '#E5EAF7',
+    level4: '#E3E8F6',
+    level5: '#DFE5F4',
+  },
+  success: '#146C55',
+  onSuccess: '#FFFFFF',
+  successContainer: '#C9EEDD',
+  onSuccessContainer: '#002117',
+  warning: '#8A5A00',
+  onWarning: '#FFFFFF',
+  warningContainer: '#FFDDB0',
+  onWarningContainer: '#2B1700',
+};
+
+export const darkColors: AppColors = {
+  primary: '#B4C5FF',
+  onPrimary: '#00297A',
+  primaryContainer: '#1A40A8',
+  onPrimaryContainer: '#DCE4FF',
+  secondary: '#BFC6DC',
+  onSecondary: '#293041',
+  secondaryContainer: '#3F4759',
+  onSecondaryContainer: '#DBE2F9',
+  tertiary: '#FFB951',
+  onTertiary: '#482A00',
+  tertiaryContainer: '#694000',
+  onTertiaryContainer: '#FFDDB0',
+  error: '#FFB4AB',
+  onError: '#690005',
+  errorContainer: '#93000A',
+  onErrorContainer: '#FFDAD6',
+  background: '#111318',
+  onBackground: '#E2E2E9',
+  surface: '#111318',
+  onSurface: '#E2E2E9',
+  surfaceVariant: '#44474F',
+  onSurfaceVariant: '#C5C6D0',
+  outline: '#8F9099',
+  outlineVariant: '#44474F',
+  shadow: '#000000',
+  scrim: '#000000',
+  inverseSurface: '#E2E2E9',
+  inverseOnSurface: '#2F3036',
+  inversePrimary: '#2457D6',
+  surfaceDisabled: 'rgba(226, 226, 233, 0.12)',
+  onSurfaceDisabled: 'rgba(226, 226, 233, 0.38)',
+  backdrop: 'rgba(46, 48, 56, 0.4)',
+  elevation: {
+    level0: 'transparent',
+    level1: '#191C24',
+    level2: '#1E222C',
+    level3: '#232835',
+    level4: '#252A37',
+    level5: '#282E3C',
+  },
+  success: '#8FD5B9',
+  onSuccess: '#003829',
+  successContainer: '#00513D',
+  onSuccessContainer: '#ABF2D4',
+  warning: '#FFB951',
+  onWarning: '#482A00',
+  warningContainer: '#694000',
+  onWarningContainer: '#FFDDB0',
+};

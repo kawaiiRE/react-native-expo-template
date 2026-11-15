@@ -1,70 +1,46 @@
 # Agent guide
 
-This is a generic, reusable Expo mobile template. It is one of three independent repositories in the Next.js + PocketBase + Expo starter set; never import source, secrets, generated types, or runtime data from its sibling templates.
+Generic, reusable Expo mobile template. It works with either of two independent backends from the same starter set: the Next.js gateway (`next-frontend-template`, backed by `pocketbase-backend-template`) or `fastify-backend-template`. Never import source, secrets, generated types or runtime data from sibling repositories; integrate only through their documented HTTP contracts.
 
 ## Stack and package manager
 
-- Expo SDK 57, React Native 0.86, React 19, Expo Router, TypeScript strict mode, React Native Paper, MobX, AsyncStorage, Zod, Vitest, ESLint, and Prettier.
-- Use Yarn through Corepack. Keep `packageManager` pinned and commit only `yarn.lock`; never add npm or pnpm lockfiles.
-- Node 24 is the local and CI baseline.
-- Expo Go is the default development path. Add a development client only when a product introduces native modules that require one.
+- Expo SDK 57, React Native 0.86, React 19, Expo Router (typed routes), strict TypeScript, React Native Paper (MD3), MobX, react-hook-form + Zod, i18next, Better Auth Expo client, Vitest, ESLint, Prettier.
+- Yarn 4 through Corepack (`corepack yarn ...`). Commit only `yarn.lock`. Add Expo modules with `npx expo install` so versions match the SDK.
+- Node 24 locally and in CI.
 
-## Repository boundary
-
-- This repository must install, test, build, version, publish, and recover independently.
-- Mobile talks to the public Next.js gateway through versioned HTTP contracts. PocketBase remains private behind Next.js unless a reviewed realtime or file flow genuinely requires direct access.
-- `EXPO_PUBLIC_API_BASE_URL` is public by definition. Never put PocketBase superuser credentials, signing secrets, private API keys, or privileged tokens in an `EXPO_PUBLIC_` variable.
-- New applications must set unique app names, slugs, schemes, bundle identifiers, Android package names, and EAS project IDs.
-
-## Structure and request flow
+## Architecture
 
 ```text
-app/ route -> component -> hook -> domain service -> API client
-                                         -> Next.js /api/* -> PocketBase
+app/ route -> component -> hook / store -> service -> backend port -> adapter (next | fastify)
 ```
 
-- `app/` contains thin Expo Router screens and layouts.
-- `src/components/` renders focused UI and receives application-facing data.
-- `src/hooks/` coordinates component lifecycle and service calls.
-- `src/services/` owns network, storage, and platform operations.
-- `src/contracts/` validates untrusted HTTP responses with Zod.
-- `src/stores/` owns genuinely shared mutable client state only.
-- `src/constants/` centralizes routes, configuration, copy, and design tokens.
-- Keep raw API calls out of screens and components. Keep storage and network work out of MobX computed values.
+- `app/` files only re-export screens and layouts from `src/components`.
+- Screens, hooks and stores depend on `src/models` and the port in `src/services/backend/ports.ts`, never on an adapter or a backend DTO. `createBackend` is the only place that branches on `EXPO_PUBLIC_BACKEND`.
+- Adapters validate every response with Zod, map errors to `AppError` (stable codes + field codes), and own credential storage. Keep both adapters behaviorally equivalent; express real differences as `AuthCapabilities` or explicit result fields, not `if (backend === ...)` in UI code.
+- MobX only for genuinely shared state (`SessionStore`, `PreferencesStore`), one `RootStore` per tree. Prefer route and component state elsewhere. No Redux, Zustand or a second state library.
+- Navigation is a single drawer (modal on compact windows, permanent at ≥ 840 dp). Do not reintroduce bottom tabs that duplicate drawer destinations.
 
-## State and persistence
+## Security and data
 
-- Prefer route state and component-local state before a store. If cross-screen mutable state is required, use MobX; do not add Redux, Zustand, or another global state library.
-- Create one store instance per React tree. Do not export a mutable singleton.
-- Validate persisted JSON before hydration. Treat it as untrusted and fall back safely when it is malformed or from an incompatible version.
-- AsyncStorage is for small, non-sensitive preferences and cache-sized data. Use SecureStore for device secrets and SQLite or the backend for larger relational data when a real requirement exists.
-- Do not claim offline support unless writes are queued, retries are idempotent, conflicts are resolved deliberately, and restart/reconnection behavior is tested.
+- `EXPO_PUBLIC_*` values are public. Never ship secrets, admin credentials or privileged tokens.
+- Credentials (gateway token, Better Auth cookie, cached profile) live in SecureStore. AsyncStorage holds only validated, non-sensitive preferences.
+- Validate persisted JSON before use and fall back safely.
+- Guest placeholder emails are never displayed (`presentIdentity`).
+- Do not claim offline support beyond what exists: the app shows offline state and keeps a stored session usable, but does not queue writes.
 
-## API, auth, and security
+## UI and copy
 
-- Keep contract versions explicit. Update the Next.js and mobile schemas together before depending on a new response shape.
-- Services return named result types and safe user-facing errors. Do not expose raw upstream errors, response bodies, or credentials.
-- Use timeouts, validate every response, and handle loading, unavailable, empty, and retry states.
-- Store production auth in platform-appropriate secure storage. Never use AsyncStorage for long-lived bearer or refresh tokens.
-- Add camera, contacts, notifications, location, billing, advertising, background tasks, or analytics only for an approved feature. Document permission rationale, denial behavior, device testing, and data handling when added.
-
-## UI
-
-- Use React Native Paper consistently and keep colors, typography, radii, and spacing centralized in `src/constants/theme.ts`.
-- Preserve visible focus, accessible labels, useful touch targets, readable wrapping, safe areas, and narrow-phone layouts.
-- Screens must not depend on a live backend to render. Remote sections need intentional loading and unavailable states.
-- Replace sample copy, tasks, identifiers, and metadata before releasing a real product.
+- Paper components with tokens from `src/theme` only; no hard-coded colors. Respect safe areas, 48 dp touch targets, accessible labels, reduced motion.
+- Every visible string goes through i18next with English and Arabic entries (`src/i18n/locales`). Plurals need Arabic `zero/one/two/few/many/other`. Dates and numbers use the presenters in `src/presenters/format.ts`.
+- RTL: use logical properties (`start`/`end`), `direction: 'auto'` for directional icons, and `SegmentedControl` instead of raw `SegmentedButtons`.
 
 ## Verification
-
-Run before handoff:
 
 ```bash
 corepack yarn install --immutable
 corepack yarn check
-corepack yarn integration:check
+corepack yarn integration:check   # needs the configured backend running
+npx expo install --check
 ```
 
-`yarn check` covers formatting, lint, strict types, tests, and a static web export. The integration check requires the Next.js and PocketBase templates to be running and `EXPO_PUBLIC_API_BASE_URL` to point to the Next.js origin.
-
-For UI changes, run `corepack yarn start` and inspect a narrow phone viewport or real device. Native permissions, deep links, push notifications, purchases, and signing changes always require device or store-build verification.
+UI changes need a look at a narrow phone, a landscape tablet, both languages and both themes. Native permissions, deep links, secure storage and signing changes need device or release-build verification. Update code, tests, `.env.example` and `docs/` together.

@@ -4,7 +4,7 @@ Thanks for improving the template. Keep changes generic, focused, and independen
 
 1. Create a branch from `main`.
 2. Install with `corepack yarn install --immutable`.
-3. Keep contracts, services, hooks, stores, screens, and tests synchronized.
+3. Keep models, both backend adapters, hooks, stores, screens, translations, and tests synchronized.
 4. Run `corepack yarn check` before opening a pull request.
 5. Describe behavior changes, native permission changes, and manual device verification in the pull request.
 

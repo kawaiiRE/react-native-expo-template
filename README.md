@@ -2,53 +2,81 @@
 
 [![CI](https://github.com/kawaiiRE/react-native-expo-template/actions/workflows/ci.yml/badge.svg)](https://github.com/kawaiiRE/react-native-expo-template/actions/workflows/ci.yml)
 
-A production-minded Expo SDK 57 starter with Expo Router, React Native Paper, strict TypeScript, focused MobX state, validated persistence, and a versioned connection to the separate Next.js + PocketBase templates.
+A production-ready Expo starter with complete account and notes flows, a Material 3 interface built on React Native Paper, English and Arabic with full RTL, and one typed backend boundary that works with **either** a Next.js gateway **or** a Fastify + Better Auth API.
 
-## What is included
+## Features
 
-- Responsive three-tab starter UI with reusable screen, card, empty, loading, and metric components
-- A small persisted task domain demonstrating MobX only where cross-screen state is useful
-- Zod-validated `GET /api/health` integration through the public Next.js gateway
-- Safe loading, unavailable, and retry states without requiring a backend during build
-- Yarn 4, ESLint, Prettier, Vitest, strict TypeScript, static web export, and immutable CI installs
-- Expo configuration for iOS, Android, web, and optional EAS builds without speculative native permissions
+- **Two backends, one app.** `EXPO_PUBLIC_BACKEND=next|fastify` selects an adapter behind a typed port (auth, account, config, health, notes). Screens never know which one is active.
+- **Every account flow.** Welcome, sign in, register (hidden when the backend closes registration), forgot and reset password (deep link or pasted code), email verification with resend, profile, change password, delete account, and expired-session handling.
+- **Guest sessions.** Opt-in "Continue as guest" with an expiry banner driven by the backend's `guestTtlHours`, upgrade to a real account that keeps the guest's notes, and "End guest session".
+- **Notes example domain.** Dashboard with stats and recent notes, debounced search, active/archived filter, infinite scroll, pull to refresh, skeletons, empty/error/retry states, create/edit with unsaved-change protection, archive with undo, confirmed delete.
+- **A real drawer.** Paper drawer content with account header, grouped sections, clear active indicator, theme and language quick switches, and pinned sign-out with confirmation. Modal with edge swipe on phones, permanent on tablets and wide screens, on the correct side in RTL.
+- **Internationalization.** English and Arabic, device-language default, Arabic plural rules, locale-aware dates and numbers, IBM Plex Sans Arabic, mirrored layout with a guided restart on native, and the profile locale kept in sync for localized emails.
+- **Polish.** Light/dark/system themes from central MD3 tokens, haptics, snackbars, confirmation dialogs, offline banner, keyboard-aware forms, route and root error boundaries, 404.
+- **Secure by default.** Credentials in SecureStore, validated persistence, Zod-validated responses, and no secrets in public config.
 
-## Start locally
+## Stack
 
-1. Install Node 24 and enable Corepack.
-2. Run `corepack yarn install --immutable`.
-3. Copy `.env.example` to `.env`.
-4. Set `EXPO_PUBLIC_API_BASE_URL` to the running Next.js origin. A physical phone needs your computer's LAN address rather than `127.0.0.1`.
-5. Run `corepack yarn start` and open Expo Go, an emulator, or the web client.
+Expo SDK 57 · React Native 0.86 · React 19 · Expo Router (typed routes) · React Native Paper · MobX · react-hook-form + Zod · i18next · Better Auth Expo client · Vitest · TypeScript strict · Yarn 4
 
-## Work with the other templates
-
-Run `pocketbase-backend-template` first, then `next-frontend-template`, and finally this app. Mobile requests `GET /api/health` from Next.js; Next.js validates and presents PocketBase's `GET /api/v1/health` response. No repository imports another repository's files.
-
-With the stack running:
+## Quick start
 
 ```bash
-corepack yarn integration:check
+corepack yarn install --immutable
+cp .env.example .env    # set EXPO_PUBLIC_BACKEND and EXPO_PUBLIC_API_BASE_URL
+corepack yarn start     # Expo Go, a simulator/emulator, or press w for web
 ```
 
-The command fails on an unreachable gateway, non-2xx response, malformed payload, unavailable PocketBase service, or incompatible API version. See [docs/integration.md](docs/integration.md).
+On a physical device, point `EXPO_PUBLIC_API_BASE_URL` at your computer's LAN address (or an HTTPS tunnel), not `127.0.0.1`.
+
+### With the Next.js gateway
+
+Run `pocketbase-backend-template`, then `next-frontend-template`, and set:
+
+```dotenv
+EXPO_PUBLIC_BACKEND=next
+EXPO_PUBLIC_API_BASE_URL=http://192.168.1.20:3000
+```
+
+### With Fastify
+
+Run `fastify-backend-template` with the app scheme trusted (`CORS_ALLOWED_ORIGINS=expo-starter://`, plus your web preview origin if you use it) and `AUTH_GUEST_ENABLED=true` if you want guests, then set:
+
+```dotenv
+EXPO_PUBLIC_BACKEND=fastify
+EXPO_PUBLIC_API_BASE_URL=http://192.168.1.20:5000
+```
+
+Full contract, deep links and the local workflow: [docs/integration.md](docs/integration.md).
 
 ## Commands
 
-```bash
-corepack yarn start
-corepack yarn android
-corepack yarn ios
-corepack yarn web
-corepack yarn check
-corepack yarn integration:check
+| Command                                           | Purpose                                                   |
+| ------------------------------------------------- | --------------------------------------------------------- |
+| `corepack yarn start` / `android` / `ios` / `web` | Development server                                        |
+| `corepack yarn check`                             | Format, lint, typecheck, unit tests and static web export |
+| `corepack yarn test`                              | Vitest in watch mode                                      |
+| `corepack yarn integration:check`                 | Live contract check against the configured backend        |
+| `corepack yarn build:web`                         | Static web export to `dist/`                              |
+
+## Project layout
+
+```text
+app/                 Expo Router routes (thin re-exports)
+src/components/      Screens, navigation, feedback and shared UI
+src/hooks/           Screen lifecycle and actions
+src/stores/          MobX session and preferences
+src/models/          Backend-neutral types and error codes
+src/services/backend Port, Next and Fastify adapters, HTTP client
+src/presenters/      Formatting and view mapping
+src/forms/           Zod form schemas
+src/i18n/            English and Arabic
+src/theme/           MD3 tokens, fonts, motion
 ```
 
-## Turn it into a real app
+## Make it yours
 
-Change the package name and the values in `.env`, replace the sample task domain one vertical slice at a time, and add native modules only when a product requirement needs them. Before a store release, add real icon and splash assets, unique bundle identifiers, signing credentials, privacy declarations, store metadata, and device-level acceptance tests.
-
-Architecture and operating notes live in [docs/architecture.md](docs/architecture.md), [docs/testing.md](docs/testing.md), and [docs/deployment.md](docs/deployment.md).
+Change the app identifiers in `.env`, replace the notes domain one vertical slice at a time (model → port → both adapters → hooks → screens → translations → tests), and add native modules only for real product requirements. Read [docs/architecture.md](docs/architecture.md), [docs/testing.md](docs/testing.md) and [docs/deployment.md](docs/deployment.md) before shipping.
 
 ## License
 

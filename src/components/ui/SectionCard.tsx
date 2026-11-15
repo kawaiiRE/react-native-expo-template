@@ -1,71 +1,81 @@
 import type { PropsWithChildren, ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { Surface, Text } from 'react-native-paper';
 
-import { appFonts, appPalette } from '@/constants/theme';
+import { makeStyles } from '@/theme/makeStyles';
+import { radii, spacing } from '@/theme/tokens';
 
 type SectionCardProps = PropsWithChildren<{
+  title?: string;
   action?: ReactNode;
-  subtitle?: string;
-  title: string;
+  /** Remove inner padding for full-bleed list rows. */
+  flush?: boolean;
 }>;
 
 export default function SectionCard({
   action,
   children,
-  subtitle,
+  flush = false,
   title,
 }: SectionCardProps) {
+  const styles = useStyles();
+
   return (
-    <Surface elevation={0} style={styles.card}>
-      <View style={styles.header}>
-        <View style={styles.headerText}>
-          <Text style={styles.title}>{title}</Text>
-          {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+    <View style={styles.section}>
+      {title || action ? (
+        <View style={styles.header}>
+          {title ? (
+            <Text
+              accessibilityRole="header"
+              style={styles.title}
+              variant="titleSmall"
+            >
+              {title}
+            </Text>
+          ) : null}
+          {action ? <View style={styles.action}>{action}</View> : null}
         </View>
-        {action ? <View style={styles.action}>{action}</View> : null}
-      </View>
-      <View style={styles.body}>{children}</View>
-    </Surface>
+      ) : null}
+      <Surface
+        elevation={0}
+        mode="flat"
+        style={[styles.card, flush && styles.flush]}
+      >
+        {children}
+      </Surface>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  action: {
-    alignItems: 'flex-end',
-    flexShrink: 0,
-  },
-  body: {
-    gap: 10,
-  },
-  card: {
-    backgroundColor: appPalette.surface,
-    borderColor: appPalette.line,
-    borderRadius: 8,
-    borderWidth: 1,
-    gap: 14,
-    padding: 14,
+const useStyles = makeStyles((theme) => ({
+  section: {
+    gap: spacing.sm,
   },
   header: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 12,
+    gap: spacing.md,
     justifyContent: 'space-between',
-  },
-  headerText: {
-    flex: 1,
-    gap: 2,
-  },
-  subtitle: {
-    color: appPalette.inkMuted,
-    fontFamily: appFonts.medium,
-    fontSize: 13,
-    lineHeight: 18,
+    minHeight: 32,
+    paddingHorizontal: spacing.xs,
   },
   title: {
-    color: appPalette.ink,
-    fontFamily: appFonts.bold,
-    fontSize: 17,
-    lineHeight: 22,
+    color: theme.colors.primary,
+    flexShrink: 1,
   },
-});
+  action: {
+    flexShrink: 0,
+  },
+  card: {
+    backgroundColor: theme.colors.elevation.level1,
+    borderRadius: radii.lg,
+    gap: spacing.md,
+    overflow: 'hidden',
+    padding: spacing.lg,
+  },
+  flush: {
+    gap: 0,
+    padding: 0,
+    paddingVertical: spacing.xs,
+  },
+}));
