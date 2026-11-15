@@ -15,5 +15,6 @@ export const appConfig = {
   backend: parseBackendConfig({
     backend: process.env.EXPO_PUBLIC_BACKEND,
     apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL,
+    allowInsecure: __DEV__,
   }),
 } as const;

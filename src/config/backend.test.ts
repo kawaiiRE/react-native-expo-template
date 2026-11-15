@@ -8,6 +8,7 @@ describe('parseBackendConfig', () => {
       parseBackendConfig({
         backend: 'fastify',
         apiBaseUrl: ' http://192.168.1.20:5000/ ',
+        allowInsecure: true,
       }),
     ).toEqual({
       ok: true,
@@ -17,6 +18,7 @@ describe('parseBackendConfig', () => {
       parseBackendConfig({
         backend: 'next',
         apiBaseUrl: 'https://app.example.com',
+        allowInsecure: false,
       }).ok,
     ).toBe(true);
   });
@@ -30,9 +32,47 @@ describe('parseBackendConfig', () => {
     ['next', 'ftp://app.example.com', ['apiBaseUrl']],
     ['', '', ['backend', 'apiBaseUrl']],
   ])('rejects backend=%s url=%s', (backend, apiBaseUrl, issues) => {
-    expect(parseBackendConfig({ backend, apiBaseUrl })).toEqual({
-      ok: false,
-      issues,
+    expect(
+      parseBackendConfig({ backend, apiBaseUrl, allowInsecure: true }),
+    ).toEqual({ ok: false, issues });
+  });
+
+  describe('release builds', () => {
+    it.each([
+      'http://api.example.com',
+      'http://127.0.0.1:3000',
+      'http://192.168.1.20:5000',
+    ])('rejects plain http origin %s', (apiBaseUrl) => {
+      expect(
+        parseBackendConfig({
+          backend: 'next',
+          apiBaseUrl,
+          allowInsecure: false,
+        }),
+      ).toEqual({ ok: false, issues: ['apiBaseUrlInsecure'] });
+    });
+
+    it('reports an invalid backend alongside an insecure origin', () => {
+      expect(
+        parseBackendConfig({
+          backend: 'pocketbase',
+          apiBaseUrl: 'http://api.example.com',
+          allowInsecure: false,
+        }),
+      ).toEqual({ ok: false, issues: ['backend', 'apiBaseUrlInsecure'] });
+    });
+
+    it('accepts https origins', () => {
+      expect(
+        parseBackendConfig({
+          backend: 'fastify',
+          apiBaseUrl: 'https://api.example.com/',
+          allowInsecure: false,
+        }),
+      ).toEqual({
+        ok: true,
+        config: { backend: 'fastify', apiBaseUrl: 'https://api.example.com' },
+      });
     });
   });
 });

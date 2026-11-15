@@ -382,6 +382,8 @@ export const en = {
       backend: 'EXPO_PUBLIC_BACKEND must be "next" or "fastify".',
       apiBaseUrl:
         'EXPO_PUBLIC_API_BASE_URL must be an http(s) origin without a path, for example https://api.example.com.',
+      apiBaseUrlInsecure:
+        'Release builds need an https:// EXPO_PUBLIC_API_BASE_URL. Plain http:// works only in development.',
     },
   },
   errorBoundary: {

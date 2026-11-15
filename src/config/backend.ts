@@ -4,7 +4,8 @@ import { BACKEND_KINDS, type BackendKind } from '@/services/backend/ports';
 
 export type BackendConfig = { backend: BackendKind; apiBaseUrl: string };
 
-export type BackendConfigIssue = 'backend' | 'apiBaseUrl';
+export type BackendConfigIssue =
+  'backend' | 'apiBaseUrl' | 'apiBaseUrlInsecure';
 
 export type BackendConfigResult =
   | { ok: true; config: BackendConfig }
@@ -31,15 +32,22 @@ const originSchema = z
 /**
  * Validates the public build-time configuration. `EXPO_PUBLIC_BACKEND` picks
  * the adapter; `EXPO_PUBLIC_API_BASE_URL` is that backend's public origin.
+ * Plain `http:` is accepted only when `allowInsecure` is set (development
+ * bundles); release builds require `https:`.
  */
 export function parseBackendConfig(source: {
   backend: string | undefined;
   apiBaseUrl: string | undefined;
+  allowInsecure: boolean;
 }): BackendConfigResult {
   const backend = z.enum(BACKEND_KINDS).safeParse(source.backend?.trim());
   const apiBaseUrl = originSchema.safeParse(source.apiBaseUrl ?? '');
+  const insecure =
+    apiBaseUrl.success &&
+    !source.allowInsecure &&
+    new URL(apiBaseUrl.data).protocol !== 'https:';
 
-  if (backend.success && apiBaseUrl.success) {
+  if (backend.success && apiBaseUrl.success && !insecure) {
     return {
       ok: true,
       config: { backend: backend.data, apiBaseUrl: apiBaseUrl.data },
@@ -49,5 +57,6 @@ export function parseBackendConfig(source: {
   const issues: BackendConfigIssue[] = [];
   if (!backend.success) issues.push('backend');
   if (!apiBaseUrl.success) issues.push('apiBaseUrl');
+  if (insecure) issues.push('apiBaseUrlInsecure');
   return { ok: false, issues };
 }

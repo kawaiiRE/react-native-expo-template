@@ -394,6 +394,8 @@ export const ar = {
       backend: 'يجب أن تكون قيمة EXPO_PUBLIC_BACKEND إما "next" أو "fastify".',
       apiBaseUrl:
         'يجب أن تكون قيمة EXPO_PUBLIC_API_BASE_URL أصل http(s) بلا مسار، مثل https://api.example.com.',
+      apiBaseUrlInsecure:
+        'تتطلب نسخ الإصدار قيمة https:// في EXPO_PUBLIC_API_BASE_URL. لا يعمل http:// إلا أثناء التطوير.',
     },
   },
   errorBoundary: {

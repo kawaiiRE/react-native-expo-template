@@ -62,6 +62,8 @@ Both backends email links to the **web frontend**: `${APP_URL}/verify-email?toke
 
 ## Local workflow
 
+Plain `http://` origins work only in development bundles (`__DEV__`). A release build with an `http://` `EXPO_PUBLIC_API_BASE_URL` shows the configuration error screen instead of sending credentials in clear text.
+
 Next.js stack: start `pocketbase-backend-template`, then `next-frontend-template`, then:
 
 ```bash
